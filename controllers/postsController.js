@@ -1,4 +1,5 @@
 const posts = require('../data/posts.js')
+const connection = require('../database/connection.js')
 
 const index = (req, res) => {
     // Inizialmente, il menu filtrato corrisponde a quello originale
