@@ -86,7 +86,7 @@ const modify = (req, res) => {
 }
 
 const destroy = (req, res) => {
-    const id = Number(req.params.id)
+    /*const id = Number(req.params.id)
     const thisPost = posts.find(post => post.id === id)
 
     if (!thisPost) {
@@ -98,7 +98,34 @@ const destroy = (req, res) => {
 
     posts.splice(posts.indexOf(thisPost), 1)
 
-    res.sendStatus(204)
+    res.sendStatus(204)*/
+
+    // This Number can sometimes prevent sql injections (but not enoguh)
+    const id = Number(req.params.id)
+
+    // Query sicura con placeholder
+    // ⚠️ SQL injection
+    const sql = 'DELETE FROM posts WHERE id = ?'
+    console.log("Executing:", sql, "with id:", id);
+
+    connection.query(sql, [id], (err, results) => {
+        if (err) {
+            console.log("DB ERROR:", err);
+            return res.status(500).json({ error: true, message: err.message });
+        }
+
+        // Se = 0 nessun post con quell'ID
+        if (results.affectedRows === 0) {
+            return res.status(404).json({
+                error: true,
+                message: 'Post not found!'
+            });
+        }
+
+        return res.status(200).json({
+            message: "Post eliminato con successo!"
+        })
+    })
 }
 
 
