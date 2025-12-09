@@ -26,7 +26,7 @@ const index = (req, res) => {
 }
 
 const show = (req, res) => {
-    const id = Number(req.params.id)
+    /*const id = Number(req.params.id)
     const thisPost = posts.find(post => post.id === id)
     // res.send(`Show the post with id: ${req.params.id}`)
 
@@ -37,7 +37,32 @@ const show = (req, res) => {
         })
     }
 
-    res.json(thisPost)
+    res.json(thisPost)*/
+
+
+    const id = Number(req.params.id)
+
+    const sql = 'SELECT * FROM posts WHERE id = ?'
+    const sqlTags = 'SELECT post_tag.tag_id, tags.label AS tag_name FROM tags JOIN post_tag ON tags.id = post_tag.tag_id WHERE post_tag.post_id = ?'
+    //console.log(sql, id);
+
+    connection.query(sql, [id], (err, response) => {
+        if (err) return res.status(500).json({ error: true, message: err.message })
+        if (response.length === 0) return res.status(404).json({ error: true, message: 'Post Not Found' })
+
+        const post = response[0]
+
+        connection.query(sqlTags, [id], (errTags, resTags) => {
+            if (errTags) return res.status(500).json({ error: true, message: errTags.message })
+
+            //console.log(errTags, resTags, post);
+
+            post['tags'] = resTags
+            console.log('POST=>', post);
+
+            res.json(post)
+        })
+    })
 }
 
 const store = (req, res) => {
