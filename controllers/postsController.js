@@ -2,18 +2,27 @@ const posts = require('../data/posts.js')
 const connection = require('../database/connection.js')
 
 const index = (req, res) => {
-    // Inizialmente, il menu filtrato corrisponde a quello originale
-    let filteredPosts = posts
-    // Se la richiesta contiene un filtro, allora filtriamo la lista dei post
-    if (req.query.tag) {
-        filteredPosts = posts.filter(post =>
-            post.tags && post.tags.includes(req.query.tag)
-        )
-    }
-    // restituiamo la variabile filteredPost
-    // potrebbe essere stata filtrata o contenere la lista originale
-    res.json(filteredPosts)
-    // URL test: http://localhost:3000/api/posts?tag=dolci
+    /* // Inizialmente, il menu filtrato corrisponde a quello originale
+     let filteredPosts = posts
+     // Se la richiesta contiene un filtro, allora filtriamo la lista dei post
+     if (req.query.tag) {
+         filteredPosts = posts.filter(post =>
+             post.tags && post.tags.includes(req.query.tag)
+         )
+     }
+     // restituiamo la variabile filteredPost
+     // potrebbe essere stata filtrata o contenere la lista originale
+     res.json(filteredPosts)
+     // URL test: http://localhost:3000/api/posts?tag=dolci*/
+
+    const sql = 'SELECT * FROM posts'
+
+    connection.query(sql, (err, results) => {
+        console.log(err, results);
+        if (err) return res.status(500).json({ error: true, message: err.message })
+
+        res.json(results)
+    })
 }
 
 const show = (req, res) => {
